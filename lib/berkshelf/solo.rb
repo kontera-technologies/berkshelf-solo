@@ -18,11 +18,11 @@ module Berkshelf
       
       def run
         [
-          :cookbook_path    , 
-          :roles_path       ,
+          :cookbook_path, 
+          :roles_path,
           :environments_path,
           :data_bags_path
-        ].map {|f| FileUtils.mkdir_p options.fetch f }
+        ].map(&options.method(:fetch)).map(&FileUtils.method(:mkdir_p))
         
         dependencies.each do |name, opt|
           solo_config["run_list"] += (opt[:recipes] || ['default']).map {|o| "recipe[#{name}::#{o}]"}
