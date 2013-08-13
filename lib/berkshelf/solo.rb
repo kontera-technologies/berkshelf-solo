@@ -1,65 +1,65 @@
 require 'berkshelf'
 require 'berkshelf/dependency'
-require 'optparse'
 require 'fileutils'
 
 module Berkshelf
   module Solo
     class Runner
 
-      Berkshelf::Dependency.add_valid_option(:recipes)
-
-      def initialize(berkfile, argv)
-        @berkfile = berkfile
-        parser.parse(argv)
-        FileUtils.mkdir_p(options[:path])
+      Berkshelf::Dependency.add_valid_option :recipes
+      
+      attr_reader :options, :dependencies, :solo_config
+      
+      def initialize dependencies, cookbook_path
+        @dependencies = dependencies
+        @options = get_options cookbook_path
+        @solo_config = { "run_list" => [] }.merge load_solo_config
       end
-
+      
       def run
+        [
+          :cookbook_path    , 
+          :roles_path       ,
+          :environments_path,
+          :data_bags_path
+        ].map {|f| FileUtils.mkdir_p options.fetch f }
+        
         dependencies.each do |name, opt|
-          solo[:run_list] += (opt[:recipes] || ['default']).map {|o| "recipe[#{name}::#{o}]"}
+          solo_config["run_list"] += (opt[:recipes] || ['default']).map {|o| "recipe[#{name}::#{o}]"}
         end
-
-        File.open(File.join(options[:path],'solo.json'),'w') { |f| f.puts solo.to_json }
-        File.open(File.join(options[:path],'solo.rb'),'w') { |f| solo_rb.map {|k,v| f.puts "#{k} #{v.inspect}"}}
-      end
-
-      def dependencies
-        @dependencies ||= Hash[
-          @berkfile.instance_variable_get(:@dependencies).map { |name, dep|
-            [name, dep.instance_variable_get(:@options)]
-          }
-        ]
-      end
-
-      def solo
-        @solo ||= { run_list: [] }
-      end
-
-      def solo_rb
-        @solo_rb ||= {
-          'file_cache_path' => options[:path],
-          'cookbook_path' => options[:cookbook_path],
-          'role_path' => options[:role_path],
-          'solo' => true
-        }
-      end
-
-      def parser
-        OptionParser.new do |opts|
-          opts.on("-p", "--path PATH", "") {|v| @options = get_options(v) }
-        end
+        solo_config["run_list"].uniq!
+        
+        File.open(options[:solo_config_path],'w') { |f| f.puts JSON.pretty_generate(solo_config) }
+        File.open(options[:solo_config_rb_path],'w') { |f| f.puts solo_config_rb }
       end
       
-      def options
-        @options ||= get_options(File.join(Dir.pwd,"chef","cookbooks"))
+      private 
+            
+      def load_solo_config
+        JSON.parse(File.read(options[:solo_config_path])) rescue Hash.new
       end
       
-      def get_options(cookbook_path)
+      def solo_config_rb
+        <<-TEXT.gsub(/^\s+/,'')
+          file_cache_path File.expand_path(File.dirname(__FILE__))
+          cookbook_path File.expand_path('../#{File.basename(options[:cookbook_path])}',__FILE__)
+          role_path File.expand_path('../roles',__FILE__)
+          environment_path File.expand_path('../environments',__FILE__)
+          data_bag_path File.expand_path('../data_bags',__FILE__)
+          solo true
+        TEXT
+      end
+      
+      def get_options cookbook_path
+        base = File.expand_path('..',cookbook_path)
         {
-          :cookbook_path => File.expand_path(cookbook_path),
-          :path          => File.expand_path('..',cookbook_path),
-          :role_path     => File.expand_path('../roles',cookbook_path)
+          :path                => base,
+          :cookbook_path       => File.expand_path(cookbook_path),
+          :roles_path          => File.join(base,'roles'),
+          :solo_config_path    => File.join(base,'solo.json'),
+          :solo_config_rb_path => File.join(base,'solo.rb'),
+          :environments_path   => File.join(base,'environments'),
+          :data_bags_path      => File.join(base,'data_bags')
         }
       end
       
@@ -68,8 +68,17 @@ module Berkshelf
 end
 
 set_trace_func proc { |_,file,_,_,binding,_|
-  if file =~ /Berksfile/i
-    Kernel.at_exit { Berkshelf::Solo::Runner.new(eval("@instance",binding),ARGV.clone).run }
+  if file =~ /Berksfile/i and ARGV.include? "vendor"
+    cookbook_path = ARGV[ARGV.index('vendor')+1]
+    FileUtils.mkdir_p(File.expand_path('..',cookbook_path))
+    Kernel.at_exit { 
+      dependencies = Hash[
+        eval("@instance",binding).instance_variable_get(:@dependencies).map { |name, dep|
+          [name, dep.instance_variable_get(:@options)]
+        }
+      ]
+      Berkshelf::Solo::Runner.new(dependencies,cookbook_path).run
+    }
     set_trace_func(nil)
   end
 }
