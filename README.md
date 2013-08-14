@@ -69,7 +69,7 @@ To override attributes just place them inside the solo.json at the root level, f
 }
 ```
 
-### Install cookbooks using `chef-solo` on you target machine
+### Install cookbooks using chef-solo on you target machine
 Now to actually install the recipes using chef-solo you will need to run this command on your target machine ( inside the main project folder,  on `Berksfile` location  )
 ```
 chef-client -c `pwd`/chef/solo.rb -j `pwd`/chef/solo.json`
