@@ -12,7 +12,7 @@ module Berkshelf
       def initialize dependencies, cookbook_path
         @dependencies = dependencies
         @options = get_options cookbook_path
-        @solo_config = { "run_list" => [] }.merge load_solo_config
+        @solo_config = load_solo_config.merge("run_list" => [])
       end
       
       attr_reader :options, :dependencies, :solo_config

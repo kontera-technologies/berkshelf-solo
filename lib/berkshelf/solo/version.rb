@@ -1,5 +1,5 @@
 module Berkshelf
   module Solo
-    VERSION="0.0.1"
+    VERSION="0.0.2"
   end
 end
