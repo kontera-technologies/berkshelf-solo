@@ -1,6 +1,7 @@
 require 'berkshelf'
 require 'berkshelf/dependency'
 require 'fileutils'
+require 'json'
 
 module Berkshelf
   module Solo
@@ -8,13 +9,13 @@ module Berkshelf
 
       Berkshelf::Dependency.add_valid_option :recipes
       
-      attr_reader :options, :dependencies, :solo_config
-      
       def initialize dependencies, cookbook_path
         @dependencies = dependencies
         @options = get_options cookbook_path
         @solo_config = { "run_list" => [] }.merge load_solo_config
       end
+      
+      attr_reader :options, :dependencies, :solo_config
       
       def run
         [
