@@ -74,3 +74,6 @@ Now to actually install the recipes using chef-solo you will need to run this co
 ```
 chef-client -c `pwd`/chef/solo.rb -j `pwd`/chef/solo.json`
 ```
+
+## Warranty
+This software is provided “as is” and without any express or implied warranties, including, without limitation, the implied warranties of merchantability and fitness for a particular purpose.
