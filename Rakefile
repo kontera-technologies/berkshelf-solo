@@ -9,7 +9,7 @@ Gem::PackageTask.new(eval File.read('berkshelf-solo.gemspec')) do |pkg|
   pkg.need_tar = false
 end
 
-task :build => [:compile] do
+task :build  do
   `rake gem`
 end
 

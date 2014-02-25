@@ -4,7 +4,7 @@ berkshelf-solo is an experimental project that acts as an adapter between [Berks
 
 ## Dependencies 
 * Ruby 1.9+
-* latest Berkshelf beta ( currently 3.0.0.beta2 )
+* latest Berkshelf beta ( currently 3.0.0.beta7 )
 * Berksfile
 
 ## Installation
