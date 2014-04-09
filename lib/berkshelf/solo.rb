@@ -67,7 +67,7 @@ module Berkshelf
 end
 
 set_trace_func proc { |_,file,_,_,binding,_|
-  if file =~ /Berksfile/i and ARGV.include? "vendor"
+  if file =~ /Berksfile/i
     cookbook_path = ARGV[ARGV.index('vendor')+1]
     FileUtils.mkdir_p(File.expand_path('..',cookbook_path))
     Kernel.at_exit { 
@@ -80,4 +80,4 @@ set_trace_func proc { |_,file,_,_,binding,_|
     }
     set_trace_func(nil)
   end
-}
+} if ARGV.include? "vendor"
