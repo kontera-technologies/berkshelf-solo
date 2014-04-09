@@ -6,8 +6,6 @@ require 'json'
 module Berkshelf
   module Solo
     class Runner
-
-      Berkshelf::Dependency.add_valid_option :recipes
       
       def initialize dependencies, cookbook_path
         @dependencies = dependencies

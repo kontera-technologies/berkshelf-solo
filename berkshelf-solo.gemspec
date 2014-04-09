@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files                 = %w(README.md Rakefile) + Dir.glob("{lib}/**/*")
   s.require_path          = "lib"
 
-  s.add_development_dependency 'minitest', '~> 5.0.0'
-  s.add_development_dependency 'mocha', '~> 0.14.0'
-  s.add_runtime_dependency 'berkshelf', '3.0.0.beta7'
+  s.add_development_dependency 'minitest', '~> 5.0'
+  s.add_development_dependency 'mocha', '~> 0.14'
+  s.add_runtime_dependency 'berkshelf', '3.0.0.beta9'
 end
