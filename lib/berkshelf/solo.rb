@@ -25,6 +25,7 @@ module Berkshelf
         
         dependencies.each do |name, opt|
           solo_config["run_list"] += (opt[:recipes] || ['default']).map {|o| "recipe[#{name}::#{o}]"}
+          solo_config[name] = opt[:attributes] if opt[:attributes]
         end
         solo_config["run_list"].uniq!
         

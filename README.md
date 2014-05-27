@@ -51,8 +51,17 @@ $ cat chef/solo.json
   ]
 }
 ```
+You can also specify cookbook attributes using the `:attibutes` option
 
-To override attributes just place them inside the `solo.json` at the root level, for example setting the root password for our mysql server
+```ruby
+cookbook 'mysql', :recipes => ["client", "server"], :attributes => {
+  "server_root_password"   => "password",
+  "server_debian_password" => "password",
+  "server_repl_password"   => "password"
+}
+```
+and after the `berks verndor` command was successfully run you should see them
+inside the `solo.json`
 
 ```
 {

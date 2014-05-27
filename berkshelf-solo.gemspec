@@ -19,5 +19,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'minitest', '~> 5.0'
   s.add_development_dependency 'mocha', '~> 0.14'
-  s.add_runtime_dependency 'berkshelf', '3.0.0.beta9'
+  s.add_runtime_dependency 'berkshelf', '~> 3.1'
 end
