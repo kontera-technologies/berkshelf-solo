@@ -21,7 +21,7 @@ gem install berkshelf-solo
 ### Compile cookbooks and prepare chef-solo layout
 add this line at the top of your Berksfile
 ```ruby
-require 'berkshelf-solo'
+require 'berkshelf/solo'
 ```
 
 after loading berkshelf-solo you will able to specify recipes that you want to install, for example lets say we want to install mysql server and client
